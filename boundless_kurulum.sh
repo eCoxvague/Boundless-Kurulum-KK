@@ -24,6 +24,18 @@ check_command() {
     return 0
 }
 
+# Build araçlarını kurma fonksiyonu
+install_build_tools() {
+    echo -e "${YELLOW}Build araçları kuruluyor...${NC}"
+    sudo apt update
+    sudo apt install -y build-essential pkg-config libssl-dev cmake gcc g++ make
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Build araçları kurulumu başarısız oldu!${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}Build araçları başarıyla kuruldu.${NC}"
+}
+
 # Kripto Kurdu Banner
 echo -e "${GREEN}"
 echo "---------------------------------------------------------"
@@ -81,29 +93,12 @@ if ! command -v cargo &> /dev/null; then
     source "$HOME/.cargo/env"
     echo -e "${GREEN}Rust başarıyla kuruldu.${NC}"
 else
-    echo -e "${YELLOW}Rust zaten kurulu.${NC}"
+    echo -e "${YELLOW}Rust zaten kurulu. Güncellemeler kontrol ediliyor...${NC}"
+    rustup update
 fi
 
-print_step "Adım 3/6: RISC Zero Kuruluyor"
-if ! command -v rzup &> /dev/null; then
-    curl -L https://risczero.com/install | bash
-    source "$HOME/.zshrc" || source "$HOME/.bashrc"
-    rzup install
-else
-    echo -e "${YELLOW}RISC Zero zaten kurulu. Güncellemeler kontrol ediliyor...${NC}"
-    rzup install
-fi
-
-# Shell profil dosyasını belirle
-SHELL_PROFILE=""
-if [[ "$SHELL" == *"zsh"* ]]; then
-    SHELL_PROFILE="$HOME/.zshrc"
-elif [[ "$SHELL" == *"bash"* ]]; then
-    SHELL_PROFILE="$HOME/.bashrc"
-else
-    echo -e "${YELLOW}Tanımlanamayan shell. PATH ayarını manuel yapmanız gerekebilir: $SHELL ${NC}"
-    SHELL_PROFILE="$HOME/.bash_profile" # Fallback
-fi
+print_step "Adım 3/6: Build Araçları Kuruluyor"
+install_build_tools
 
 print_step "Adım 4/6: Bento Client ve Boundless CLI Kuruluyor"
 echo -e "${YELLOW}Cargo PATH kontrolü yapılıyor...${NC}"
@@ -113,6 +108,8 @@ echo -e "${YELLOW}Bento Client kuruluyor...${NC}"
 cargo install --git https://github.com/risc0/risc0 bento-client --bin bento_cli
 
 echo -e "${YELLOW}Boundless CLI kuruluyor...${NC}"
+# Önce temiz bir kurulum için cargo clean
+cargo clean
 cargo install --locked boundless-cli
 
 # Kurulum sonrası kontrol
@@ -120,6 +117,7 @@ if ! check_command boundless; then
     echo -e "${RED}Boundless CLI kurulumu başarısız oldu!${NC}"
     echo -e "${YELLOW}Lütfen şu komutları manuel olarak çalıştırın:${NC}"
     echo "source ~/.cargo/env"
+    echo "cargo clean"
     echo "cargo install --locked boundless-cli"
     exit 1
 fi
