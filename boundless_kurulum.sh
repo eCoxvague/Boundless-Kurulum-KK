@@ -6,6 +6,24 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# PATH kontrolü ve ayarlama fonksiyonu
+setup_path() {
+    if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
+        echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$SHELL_PROFILE"
+        export PATH="$HOME/.cargo/bin:$PATH"
+        echo -e "${GREEN}PATH güncellendi.${NC}"
+    fi
+}
+
+# Komut kontrolü fonksiyonu
+check_command() {
+    if ! command -v $1 &> /dev/null; then
+        echo -e "${RED}$1 komutu bulunamadı!${NC}"
+        return 1
+    fi
+    return 0
+}
+
 # Kripto Kurdu Banner
 echo -e "${GREEN}"
 echo "---------------------------------------------------------"
@@ -88,12 +106,24 @@ else
 fi
 
 print_step "Adım 4/6: Bento Client ve Boundless CLI Kuruluyor"
-cargo install --git https://github.com/risc0/risc0 bento-client --bin bento_cli
-export PATH="$HOME/.cargo/bin:$PATH"
-echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $SHELL_PROFILE
+echo -e "${YELLOW}Cargo PATH kontrolü yapılıyor...${NC}"
+setup_path
 
+echo -e "${YELLOW}Bento Client kuruluyor...${NC}"
+cargo install --git https://github.com/risc0/risc0 bento-client --bin bento_cli
+
+echo -e "${YELLOW}Boundless CLI kuruluyor...${NC}"
 cargo install --locked boundless-cli
-source $SHELL_PROFILE || echo -e "${YELLOW}Shell profil dosyası kaynaklanamadı. Yeni bir terminal açmanız gerekebilir.${NC}"
+
+# Kurulum sonrası kontrol
+if ! check_command boundless; then
+    echo -e "${RED}Boundless CLI kurulumu başarısız oldu!${NC}"
+    echo -e "${YELLOW}Lütfen şu komutları manuel olarak çalıştırın:${NC}"
+    echo "source ~/.cargo/env"
+    echo "cargo install --locked boundless-cli"
+    exit 1
+fi
+
 echo -e "${GREEN}Bento ve Boundless CLI başarıyla kuruldu.${NC}"
 
 print_step "Adım 5/6: Yapılandırma Dosyası (.env) Oluşturuluyor"
@@ -109,6 +139,12 @@ source .env.eth-sepolia
 echo -e "${GREEN}.env.eth-sepolia dosyası başarıyla oluşturuldu ve yüklendi.${NC}"
 
 print_step "Adım 6/6: Zincir Üstü (On-Chain) İşlemler"
+# Boundless komutunun varlığını kontrol et
+if ! check_command boundless; then
+    echo -e "${RED}Boundless CLI bulunamadı! Lütfen kurulumu tekrar deneyin.${NC}"
+    exit 1
+fi
+
 echo -e "${YELLOW}Şimdi USDC Faucet'ten test tokeni almanız gerekiyor.${NC}"
 echo "Lütfen şu adrese gidin: https://faucet.circle.com"
 echo "Ağ olarak 'Sepolia' seçin ve cüzdan adresinizi girerek 10 USDC talep edin."
