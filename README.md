@@ -1,5 +1,7 @@
 # Boundless (Base Mainnet) Kurulum Rehberi
 
+> ⚠️ **ÖNEMLİ NOT:** Eğer Ubuntu, WSL2 (Windows için) veya Homebrew (macOS için) kurulumlarınız tamamlandıysa, doğrudan [Ön Gereksinimler](#ön-gereksinimler) bölümüne geçebilirsiniz!
+
 Bu rehber, Boundless'ın Base Mainnet üzerindeki kurulumunu adım adım açıklamaktadır.
 
 ## İşletim Sistemine Göre Kurulum
@@ -14,10 +16,10 @@ Bu rehber, Boundless'ın Base Mainnet üzerindeki kurulumunu adım adım açıkl
      ```
    - Kurulum tamamlandıktan sonra bilgisayarınızı yeniden başlatın
    - Bilgisayar açıldıktan sonra:
-     - Windows tuşuna basın yada arama yerine
-     - "Ubuntu" yazın ve tıklayın
-     - İlk kez açılıyorsa, kullanıcı adı ve şifre belirlemeniz istenecek
-     - Bu bilgileri not alın, daha sonra kullanacaksınız
+      - Windows tuşuna basın yada arama yerine
+      - "Ubuntu" yazın ve tıklayın
+      - İlk kez açılıyorsa, kullanıcı adı ve şifre belirlemeniz istenecek
+      - Bu bilgileri not alın, daha sonra kullanacaksınız
 
 2. **Ubuntu'yu Açma:**
    - Windows tuşuna basın yada arama yerini açın
@@ -105,31 +107,70 @@ Kuruluma başlamadan önce, yeni bir cüzdan oluşturup hazırlamanız gerekiyor
 
 ## Kurulum Adımları (Tüm işletim sistemleri için ORTAK!)
 
-### 1. Çalışma Dizini Oluşturma
+### 1. Ubuntu Terminal'i Açın ve Root Yetkisi Alın
+
+#### Windows Kullanıcıları İçin:
+1. Windows tuşuna basın
+2. "Ubuntu" yazın
+3. Ubuntu uygulamasına tıklayın
+4. Terminal açıldığında aşağıdaki komutları sırayla çalıştırın:
 
 ```bash
+# Root yetkisi alın (şifrenizi girmeniz istenecek)
+sudo su
+
 # Ana dizine gidin
 cd ~
+```
 
+#### macOS Kullanıcıları İçin:
+1. Spotlight'ı açın (Command + Space)
+2. "Terminal" yazın
+3. Terminal uygulamasına tıklayın
+4. Terminal açıldığında aşağıdaki komutları sırayla çalıştırın:
+
+```bash
+# Root yetkisi alın (şifrenizi girmeniz istenecek)
+sudo su
+
+# Ana dizine gidin
+cd ~
+```
+
+#### Linux Kullanıcıları İçin:
+1. Terminal'i açın (Ctrl + Alt + T)
+2. Terminal açıldığında aşağıdaki komutları sırayla çalıştırın:
+
+```bash
+# Root yetkisi alın (şifrenizi girmeniz istenecek)
+sudo su
+
+# Ana dizine gidin
+cd ~
+```
+
+### 2. Çalışma Dizini Oluşturma
+
+```bash
 # Yeni bir klasör oluşturun
 mkdir boundless-setup
 cd boundless-setup
 ```
 
-### 2. Script Dosyasını Oluşturma
+### 3. Script Dosyasını Oluşturma
 
 ```bash
 # Script dosyasını oluşturun
 nano boundless_base_kurulum.sh
 ```
 
-### 3. Script Kodunu Kopyalama
+### 4. Script Kodunu Kopyalama
 
 1. Bu repodaki `boundless_base_kurulum.sh` dosyasını açın
 2. Tüm içeriği kopyalayın (CTRL+A, CTRL+C)
 3. Terminal'deki nano editörüne yapıştırın (CTRL+SHIFT+V veya sağ tık)
 
-### 4. Dosyayı Kaydetme ve Çalıştırılabilir Yapma
+### 5. Dosyayı Kaydetme ve Çalıştırılabilir Yapma
 
 1. Nano editöründe:
    - `CTRL + X` tuşlarına basın
@@ -141,7 +182,7 @@ nano boundless_base_kurulum.sh
 chmod +x boundless_base_kurulum.sh
 ```
 
-### 5. Scripti Çalıştırma
+### 6. Scripti Çalıştırma
 
 ```bash
 ./boundless_base_kurulum.sh
