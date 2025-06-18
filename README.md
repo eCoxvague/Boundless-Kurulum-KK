@@ -1,127 +1,202 @@
-# Boundless Dev & Prover Rolü Otomatik Kurulum Script'i
+# Boundless (Base Mainnet) Kurulum Rehberi
 
-Bu script, Boundless testnet rolleri için gereken tüm teknik kurulumu otomatik olarak yapar. Sizden sadece RPC URL ve özel anahtarınızı isteyecek, geri kalan her şeyi otomatik halledecektir.
+Bu rehber, Boundless'ın Base Mainnet üzerindeki kurulumunu adım adım açıklamaktadır.
 
-## 🚀 Özellikler
+## İşletim Sistemine Göre Kurulum
 
-- Gerekli tüm programları otomatik kurulum (Rust, Risc Zero, Bento, Boundless CLI)
-- Doğru shell ayarlarını otomatik yapılandırma
-- `.env` dosyasını otomatik oluşturma
-- Stake ve Deposit işlemlerini otomatik gerçekleştirme
+### Windows Kullanıcıları İçin (Sadece windows kullanıcıları için!)
 
-## 💻 Sistem Gereksinimleri
-
-### Windows Kullanıcıları İçin
-1. Windows 10 veya Windows 11
-2. WSL2 kurulumu:
+1. **WSL2 Kurulumu:**
    - Windows PowerShell'i yönetici olarak açın (Windows tuşu + X, sonra "Windows PowerShell (Yönetici)")
-   - `wsl --install` komutunu çalıştırın
-   - Bilgisayarınızı yeniden başlatın
-   - Ubuntu otomatik açılacak, kullanıcı adı ve şifre belirleyin
+   - Aşağıdaki komutu çalıştırın:
+     ```powershell
+     wsl --install
+     ```
+   - Kurulum tamamlandıktan sonra bilgisayarınızı yeniden başlatın
+   - Bilgisayar açıldıktan sonra:
+     - Windows tuşuna basın yada arama yerine
+     - "Ubuntu" yazın ve tıklayın
+     - İlk kez açılıyorsa, kullanıcı adı ve şifre belirlemeniz istenecek
+     - Bu bilgileri not alın, daha sonra kullanacaksınız
 
-### macOS Kullanıcıları İçin
-1. macOS 10.15 veya üzeri
-2. Terminal uygulaması (macOS ile birlikte gelir)
-
-### Linux Kullanıcıları İçin
-1. Ubuntu 20.04 veya üzeri
-2. Terminal uygulaması (Ubuntu ile birlikte gelir)
-
-## 📋 Ön Gereksinimler
-
-- 6 aydan eski Discord ve Github hesapları
-- Test cüzdanında Sepolia ETH
-- Infura'dan alınmış Sepolia RPC URL
-
-## ⚠️ Önemli Güvenlik Uyarısı
-
-Bu script, Metamask Özel Anahtarınızı (Private Key) isteyecektir. Lütfen:
-- MUTLAKA test için kullandığınız, içinde gerçek varlık olmayan BOŞ bir cüzdan kullanın
-- Özel anahtarınızı güvenli bir şekilde saklayın
-
-## 🛠️ Kurulum
-
-### Windows Kullanıcıları İçin
-1. WSL2 ve Ubuntu kurulumunu tamamlayın
-2. Ubuntu'yu açın:
-   - Windows tuşuna basın
+2. **Ubuntu'yu Açma:**
+   - Windows tuşuna basın yada arama yerini açın
    - "Ubuntu" yazın ve tıklayın
    - VEYA Windows tuşu + R'ye basıp "ubuntu" yazın
-3. Script'i indirin:
+
+3. **Gerekli Paketleri Kurma:**
+   ```bash
+   sudo apt update
+   sudo apt install -y git nano
+   ```
+
+### macOS Kullanıcıları İçin (Sadece macOS kullanıcı için!)
+
+1. **Homebrew Kurulumu:**
+   - Terminal'i açın
+   - Aşağıdaki komutu yapıştırın:
+     ```bash
+     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+     ```
+   - Kurulum tamamlandıktan sonra:
+     ```bash
+     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+     eval "$(/opt/homebrew/bin/brew shellenv)"
+     ```
+
+2. **Gerekli Paketleri Kurma:**
+   ```bash
+   brew install git
+   ```
+
+### Linux Kullanıcıları İçin (Sadece linux kullanıcıları için!)
+
+1. **Gerekli Paketleri Kurma:**
+   ```bash
+   sudo apt update
+   sudo apt install -y git nano
+   ```
+
+## Ön Gereksinimler
+
+1. 6 aydan eski Discord ve Github hesapları
+2. Base Mainnet ağında ETH bakiyesi olan bir cüzdan (ana cüzdanınız değil!)
+3. Infura'dan alınmış Base Mainnet RPC URL'si
+
+## Infura'dan Base RPC URL Alma
+
+1. **MetaMask Developer Portal'a Giriş:**
+   - [MetaMask Developer Portal](https://developer.metamask.io/register) adresine gidin
+   - Kayıt olun veya giriş yapın
+
+2. **Infura RPC'ye Erişim:**
+   - Sol menüden "Infura RPC" seçeneğine tıklayın
+   - Sağ üst köşedeki "Active Endpoints" butonuna tıklayın
+   - Açılan listeden "Base Mainnet"i bulun
+   - Base Mainnet'in RPC URL'sini kopyalayın
+   - Bu URL'yi güvenli bir yere kaydedin, script çalıştırırken kullanacağız
+
+## Cüzdan Hazırlığı
+
+Kuruluma başlamadan önce, yeni bir cüzdan oluşturup hazırlamanız gerekiyor:
+
+1. **Yeni Cüzdan Oluşturma:**
+   - MetaMask'ı açın
+   - "Create a new wallet" seçeneğini tıklayın
+   - Güvenli bir şifre belirleyin
+   - Secret Recovery Phrase'i güvenli bir yere kaydedin
+   - Bu cüzdanı sadece Boundless için kullanacağız
+
+2. **Base Mainnet Ağını Ekleme:**
+   - https://chainlist.org/?search=base buradan base ağını cüzdana ekleyin!
+
+3. **Cüzdana Fon Gönderme:**
+   - Ana cüzdanınızdan yeni oluşturduğunuz cüzdana:
+     - En az 1 USDC
+     - İşlem ücretleri için 2-3 dolarlık ETH gönderin
+   - Base Mainnet ağını seçtiğinizden emin olun
+   - Transferlerin tamamlanmasını bekleyin
+
+4. **USDC Alımı:**
+   - [Uniswap](https://app.uniswap.org/swap) sitesine gidin
+   - Base Mainnet ağını seçin
+   - ETH'nizi USDC ile değiştirin (en az 1 USDC)
+   - İşlemin tamamlanmasını bekleyin
+
+## Kurulum Adımları (Tüm işletim sistemleri için ORTAK!)
+
+### 1. Çalışma Dizini Oluşturma
+
 ```bash
-git clone https://github.com/eCoxvague/Boundless-Kurulum-KK.git
-```
-4. Script klasörüne girin:
-```bash
-cd Boundless-Kurulum-KK
-```
-5. Script'i çalıştırılabilir yapın:
-```bash
-chmod +x boundless_kurulum.sh
-```
-6. Script'i çalıştırın:
-```bash
-./boundless_kurulum.sh
+# Ana dizine gidin
+cd ~
+
+# Yeni bir klasör oluşturun
+mkdir boundless-setup
+cd boundless-setup
 ```
 
-### macOS Kullanıcıları İçin
-1. Terminal'i açın
-2. Script'i indirin:
+### 2. Script Dosyasını Oluşturma
+
 ```bash
-git clone https://github.com/eCoxvague/Boundless-Kurulum-KK.git
-```
-3. Script klasörüne girin:
-```bash
-cd Boundless-Kurulum-KK
-```
-4. Script'i çalıştırılabilir yapın:
-```bash
-chmod +x boundless_kurulum.sh
-```
-5. Script'i çalıştırın:
-```bash
-./boundless_kurulum.sh
+# Script dosyasını oluşturun
+nano boundless_base_kurulum.sh
 ```
 
-### Linux Kullanıcıları İçin
-1. Terminal'i açın
-2. Script'i indirin:
+### 3. Script Kodunu Kopyalama
+
+1. Bu repodaki `boundless_base_kurulum.sh` dosyasını açın
+2. Tüm içeriği kopyalayın (CTRL+A, CTRL+C)
+3. Terminal'deki nano editörüne yapıştırın (CTRL+SHIFT+V veya sağ tık)
+
+### 4. Dosyayı Kaydetme ve Çalıştırılabilir Yapma
+
+1. Nano editöründe:
+   - `CTRL + X` tuşlarına basın
+   - `Y` tuşuna basarak değişiklikleri kaydetmeyi onaylayın
+   - `ENTER` tuşuna basarak dosya adını onaylayın
+
+2. Dosyayı çalıştırılabilir yapın:
 ```bash
-git clone https://github.com/eCoxvague/Boundless-Kurulum-KK.git
+chmod +x boundless_base_kurulum.sh
 ```
-3. Script klasörüne girin:
+
+### 5. Scripti Çalıştırma
+
 ```bash
-cd Boundless-Kurulum-KK
+./boundless_base_kurulum.sh
 ```
-4. Script'i çalıştırılabilir yapın:
+
+## Önemli Notlar
+
+- Script çalışırken sizden RPC URL ve özel anahtar (private key) isteyecektir
+- Özel anahtarınızı girerken yazdıklarınız görünmeyecektir (güvenlik için)
+- Script, Base Mainnet üzerinde işlem yapacağı için gerçek ETH gerektirir
+- Ana cüzdanınızı DEĞİL, düşük bakiyeli bir test cüzdanı kullanmanız önerilir
+
+## Manuel Adımlar
+
+Script tamamlandıktan sonra:
+
+1. [Guild Sayfasına](https://guild.xyz/boundless-xyz) gidin
+   - Cüzdanınızı bağlayın
+   - 'Dev' ve 'Prover' rollerinin aktif olduğunu kontrol edin
+
+2. Discord'a gidin
+   - '#claim-dev-prover-roles' kanalına gidin
+   - 'Claim' butonlarına tıklayarak rollerinizi alın
+
+## Sorun Giderme
+
+Eğer kurulum sırasında bir hata alırsanız:
+
+1. RPC URL'nizin doğru olduğundan emin olun
+2. Cüzdanınızda yeterli ETH ve USDC olduğunu kontrol edin
+3. Base Mainnet ağında olduğunuzdan emin olun
+
+### Yaygın Hatalar ve Çözümleri
+
+#### Windows'ta WSL Hatası
+```powershell
+wsl --install
+```
+komutu çalışmazsa:
+1. Windows özelliklerinden "Windows Subsystem for Linux"u etkinleştirin
+2. PowerShell'i yönetici olarak açıp tekrar deneyin
+
+#### macOS'ta Homebrew Hatası
+Homebrew kurulumu başarısız olursa:
+1. Xcode Command Line Tools'u kurun:
 ```bash
-chmod +x boundless_kurulum.sh
+xcode-select --install
 ```
-5. Script'i çalıştırın:
+2. Homebrew kurulumunu tekrar deneyin
+
+#### Linux'ta Paket Hatası
+Paket kurulumu başarısız olursa:
 ```bash
-./boundless_kurulum.sh
+sudo apt update && sudo apt upgrade
 ```
+komutunu çalıştırıp tekrar deneyin
 
-## 📝 Script Ne Yapacak?
-
-Script çalıştığında otomatik olarak:
-1. Gerekli tüm programları kuracak
-2. Sizden RPC URL ve özel anahtarınızı isteyecek
-3. USDC talep etmenizi bekleyecek
-4. Stake ve deposit işlemlerini yapacak
-
-## 🎯 Son Adımlar
-
-Kurulum tamamlandıktan sonra:
-1. [Guild Sayfasına](https://guild.xyz/boundless-xyz) gidin ve cüzdanınızı bağlayın
-2. Discord'da '#claim-dev-prover-roles' kanalına giderek rollerinizi alın
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
-
-## 📞 İletişim
-
-Kripto Kurdu - [@kriptokurduu](https://twitter.com/kriptokurduu)
-
-Proje Linki: [https://github.com/eCoxvague/Boundless-Kurulum-KK](https://github.com/eCoxvague/Boundless-Kurulum-KK)
+## Kripto Kurdu Ekibi
